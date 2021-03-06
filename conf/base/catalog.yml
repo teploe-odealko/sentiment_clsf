@@ -2,3 +2,10 @@
 #
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://kedro.readthedocs.io/en/stable/05_data/01_data_catalog.html
+reviews:
+  type: pandas.ExcelDataSet
+  filepath: data/01_raw/reviews.xlsx
+
+reviews_preprocessed:
+  type: pandas.ExcelDataSet
+  filepath: data/03_raw/reviews_preprocessed.csv
