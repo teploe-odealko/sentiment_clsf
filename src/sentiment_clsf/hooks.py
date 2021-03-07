@@ -36,7 +36,7 @@ from kedro.pipeline import Pipeline
 from kedro.versioning import Journal
 
 from sentiment_clsf.pipelines import data_engineering as de
-# from sentiment_clsf.pipelines import data_science as ds
+from sentiment_clsf.pipelines import data_science as ds
 
 class ProjectHooks:
     @hook_impl
@@ -48,12 +48,12 @@ class ProjectHooks:
 
         """
         data_engineering_pipeline = de.create_pipeline()
-        # data_science_pipeline = ds.create_pipeline()
+        data_science_pipeline = ds.create_pipeline()
 
         return {
-            # "__default__": data_engineering_pipeline + data_science_pipeline,
-            "__default__": data_engineering_pipeline,
-            # "ds": data_science_pipeline,
+            "__default__": data_engineering_pipeline + data_science_pipeline,
+            "de": data_engineering_pipeline,
+            "ds": data_science_pipeline,
         }
 
     @hook_impl

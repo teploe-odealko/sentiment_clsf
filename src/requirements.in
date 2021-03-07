@@ -13,3 +13,4 @@ pytest~=6.1.2
 wheel==0.32.2
 pymorphy2==0.9.1
 nltk==3.2.5
+gensim==3.6.0

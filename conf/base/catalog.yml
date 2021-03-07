@@ -5,7 +5,13 @@
 reviews:
   type: pandas.ExcelDataSet
   filepath: data/01_raw/reviews.xlsx
+  versioned: True
 
 reviews_preprocessed:
-  type: pandas.ExcelDataSet
-  filepath: data/03_raw/reviews_preprocessed.csv
+  type: pandas.CSVDataSet
+  filepath: data/03_primary/reviews_preprocessed.csv
+
+generated_features:
+  type: pickle.PickleDataSet
+  filepath: data/04_feature/features.pkl
+  versioned: True
