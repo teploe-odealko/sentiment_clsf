@@ -7,6 +7,8 @@ from gensim.models import Word2Vec
 import numpy as np
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_regression
+import logging
+
 
 
 def lemmatize_str(text):
@@ -84,8 +86,15 @@ def generate_features(preprocessed: pd.DataFrame, params: Dict) -> List:
         Returns:
             Generated features.
     """
-    bow_features = generate_bow(preprocessed, params)
-    tfidf_features = generate_tfidf(preprocessed, params)
+    # if len(preprocessed) == 0:
+    #     raise ValueError('Empty preprocessed dataset')
+    log = logging.getLogger(__name__)
+    try:
+        bow_features = generate_bow(preprocessed, params)
+        tfidf_features = generate_tfidf(preprocessed, params)
+    except ValueError as e:
+        log.error(e)
+        return [np.ndarray(0), np.ndarray(0)]
     w2v_features = generate_w2v(preprocessed, params)
 
     stacked_features = np.concatenate(

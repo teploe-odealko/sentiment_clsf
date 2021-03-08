@@ -14,3 +14,6 @@ wheel==0.32.2
 pymorphy2==0.9.1
 nltk==3.2.5
 gensim==3.6.0
+pandas==1.2.3
+sklearn==0.0
+hypothesis
