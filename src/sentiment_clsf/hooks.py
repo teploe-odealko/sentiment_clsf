@@ -38,6 +38,7 @@ from kedro.versioning import Journal
 from sentiment_clsf.pipelines import data_engineering as de
 from sentiment_clsf.pipelines import data_science as ds
 
+
 class ProjectHooks:
     @hook_impl
     def register_pipelines(self) -> Dict[str, Pipeline]:

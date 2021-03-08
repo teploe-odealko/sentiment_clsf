@@ -8,13 +8,13 @@ def create_pipeline(**kwargs):
         [
             node(
                 func=split_data,
-                inputs=["reviews_preprocessed", "parameters"],
+                inputs=["generated_features", "labels", "parameters"],
                 outputs=["X_train", "X_val", "X_test", "y_train", "y_val", "y_test"],
                 name="splitting_data",
             ),
             node(
                 func=train_model,
-                inputs=["X_train", "y_train"],
+                inputs=["X_train", "y_train", "parameters"],
                 outputs="regressor",
                 name="training_model",
             ),

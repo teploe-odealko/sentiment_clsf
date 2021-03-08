@@ -15,3 +15,8 @@ generated_features:
   type: pickle.PickleDataSet
   filepath: data/04_feature/features.pkl
   versioned: True
+
+labels:
+  type: pickle.PickleDataSet
+  filepath: data/04_feature/labels.pkl
+  versioned: True

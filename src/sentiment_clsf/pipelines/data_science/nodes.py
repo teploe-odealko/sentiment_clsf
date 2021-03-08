@@ -3,61 +3,86 @@ from typing import Dict, List
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+
+# from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
 
-def split_data(data: pd.DataFrame, parameters: Dict) -> List:
+def split_data(features: np.ndarray, labels: np.ndarray, params: Dict) -> List:
     """Splits data into training and test sets.
 
         Args:
-            data: preprocessed data.
-            parameters: Parameters defined in parameters.yml.
+            features: generated features from reviews.
+            labels: graund-truth labels
+            params: Parameters defined in parameters.yml.
         Returns:
             A list containing split data.
 
     """
-    data, data_test, = train_test_split(data, test_size=parameters['test_size'], random_state=parameters['seed'],
-                                        stratify=data.label)
-    data_train, data_val = train_test_split(data, test_size=parameters['test_size'], random_state=parameters['seed'],
-                                            stratify=data.label)
-    X_train = data_train.text
-    y_train = data_train.label
-    X_val = data_val.text
-    y_val = data_val.label
-    X_test = data_test.text
-    y_test = data_test.label
+    X_train, X_test, y_train, y_test = train_test_split(
+        features,
+        labels,
+        test_size=params["test_size"],
+        random_state=params["seed"],
+        stratify=labels,
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train,
+        y_train,
+        test_size=params["test_size"],
+        random_state=params["seed"],
+        stratify=y_train,
+    )
 
     return [X_train, X_val, X_test, y_train, y_val, y_test]
 
 
-def train_model(X_train: np.ndarray, y_train: np.ndarray) -> LinearRegression:
-    """Train the linear regression model.
+def train_model(
+    X_train: np.ndarray, y_train: np.ndarray, params: Dict
+) -> LogisticRegression:
+    """Train the regression models and choose the best one by cv.
 
         Args:
-            X_train: Training data of independent features.
-            y_train: Training data for price.
+            X_train: train data.
+            y_train: tain labels.
 
         Returns:
             Trained model.
 
     """
-    regressor = LinearRegression()
-    regressor.fit(X_train, y_train)
-    return regressor
+    parameters = {"C": [0.1, 0.4, 0.5, 1, 1.2, 10]}
+    lgreg = LogisticRegression(random_state=params["seed"], max_iter=10000)
+    clf = GridSearchCV(lgreg, parameters, scoring="f1")
+    clf.fit(X_train, y_train)
+    return clf.best_estimator_
 
 
-def evaluate_model(regressor: LinearRegression, X_test: np.ndarray, y_test: np.ndarray):
+def assess_pred_target(target, pred):
+    pr, rec, f1, _ = precision_recall_fscore_support(target, pred, average="binary")
+    res = pd.DataFrame()
+    res["Precision"] = [pr]
+    res["Recall"] = [rec]
+    res["f1"] = [f1]
+    res["accuracy"] = [accuracy_score(target, pred)]
+    return res
+
+
+def evaluate_model(
+    regressor: LogisticRegression, X_test: np.ndarray, y_test: np.ndarray
+):
     """Calculate the coefficient of determination and log the result.
 
         Args:
             regressor: Trained model.
-            X_test: Testing data of independent features.
-            y_test: Testing data for price.
+            X_test: test data.
+            y_test: test labels.
 
     """
     y_pred = regressor.predict(X_test)
-    score = r2_score(y_test, y_pred)
+
+    # score = r2_score(y_test, y_pred)
     logger = logging.getLogger(__name__)
-    logger.info("Model has a coefficient R^2 of %.3f.", score)
+    logger.info(assess_pred_target(y_test, y_pred).T)

@@ -15,8 +15,8 @@ def create_pipeline(**kwargs):
             node(
                 func=generate_features,
                 inputs=["reviews_preprocessed", "parameters"],
-                outputs="generated_features",
-                name="generating_features"
-            )
+                outputs=["generated_features", "labels"],
+                name="generating_features",
+            ),
         ]
     )
