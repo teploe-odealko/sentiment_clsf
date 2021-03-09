@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.6-buster
+ARG BASE_IMAGE=python:3.7-buster
 FROM $BASE_IMAGE
 
 # install project requirements
@@ -20,4 +20,4 @@ RUN chmod -R a+w /home/kedro
 
 EXPOSE 8888
 
-CMD ["kedro", "run"]
+CMD ["python", "serv/api.py"]

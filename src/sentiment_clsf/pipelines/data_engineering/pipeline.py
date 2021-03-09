@@ -15,7 +15,13 @@ def create_pipeline(**kwargs):
             node(
                 func=generate_features,
                 inputs=["reviews_preprocessed", "parameters"],
-                outputs=["generated_features", "labels"],
+                outputs=["generated_features",
+                         "labels",
+                         "bow_vectorizer",
+                         "tfidf_vectorizer",
+                         "w2v_model",
+                         # "best_features_selector"
+                         ],
                 name="generating_features",
             ),
         ]

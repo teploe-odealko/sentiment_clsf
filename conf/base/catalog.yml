@@ -20,3 +20,23 @@ labels:
   type: pickle.PickleDataSet
   filepath: data/04_feature/labels.pkl
   versioned: True
+
+model_logreg:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/model.pkl
+
+bow_vectorizer:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/bow_vectorizer.pkl
+
+tfidf_vectorizer:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/tfidf_vectorizer.pkl
+
+w2v_model:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/w2v_model.pkl
+
+best_features_selector:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/best_features_selector.pkl

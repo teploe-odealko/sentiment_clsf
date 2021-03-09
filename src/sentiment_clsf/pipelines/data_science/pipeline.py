@@ -15,12 +15,12 @@ def create_pipeline(**kwargs):
             node(
                 func=train_model,
                 inputs=["X_train", "y_train", "parameters"],
-                outputs="regressor",
+                outputs="model_logreg",
                 name="training_model",
             ),
             node(
                 func=evaluate_model,
-                inputs=["regressor", "X_test", "y_test"],
+                inputs=["model_logreg", "X_test", "y_test"],
                 outputs=None,
                 name="evaluating_model",
             ),

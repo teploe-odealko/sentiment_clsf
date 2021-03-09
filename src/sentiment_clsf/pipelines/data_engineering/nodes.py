@@ -32,6 +32,7 @@ def preprocess_reviews(reviews: pd.DataFrame) -> pd.DataFrame:
     """
 
     reviews.text = reviews.text.apply(lemmatize_str)
+    # print(reviews.text)
     return reviews
 
 
@@ -39,14 +40,18 @@ def generate_bow(preprocessed, params):
     vectorizer = CountVectorizer(
         token_pattern=r"[A-Za-zА-Яа-я]+", min_df=params["min_vectorizer_freq"]
     )
-    return vectorizer.fit_transform(preprocessed.text).toarray()
+    vectorizer.fit(preprocessed.text)
+    features = vectorizer.transform(preprocessed.text).toarray()
+    return features, vectorizer
 
 
 def generate_tfidf(preprocessed, params):
     vectorizer = TfidfVectorizer(
         token_pattern=r"[A-Za-zА-Яа-я]+", min_df=params["min_vectorizer_freq"]
     )
-    return vectorizer.fit_transform(preprocessed.text).toarray()
+    vectorizer.fit(preprocessed.text)
+    features = vectorizer.transform(preprocessed.text).toarray()
+    return features, vectorizer
 
 
 def generate_w2v(preproccessed, params):
@@ -74,7 +79,7 @@ def generate_w2v(preproccessed, params):
             [w2v_model.wv[w] for w in text.split() if w in w2v_model.wv], axis=0
         )
     )
-    return np.array([sen.tolist() for sen in sent_emb])
+    return np.array([sen.tolist() for sen in sent_emb]), w2v_model
 
 
 def generate_features(preprocessed: pd.DataFrame, params: Dict) -> List:
@@ -84,22 +89,34 @@ def generate_features(preprocessed: pd.DataFrame, params: Dict) -> List:
             preprocessed: preprocessed data.
             params: Parameters defined in parameters.yml.
         Returns:
-            Generated features.
+            [Generated features,
+            labels,
+            trained bag of words vectorizer,
+            trained tf-idf vectorizer,
+            trained word2vec model]
+
     """
     # if len(preprocessed) == 0:
     #     raise ValueError('Empty preprocessed dataset')
     log = logging.getLogger(__name__)
     try:
-        bow_features = generate_bow(preprocessed, params)
-        tfidf_features = generate_tfidf(preprocessed, params)
+        bow_features, bow_victorizer = generate_bow(preprocessed, params)
+        tfidf_features, tfidf_vevtorizer = generate_tfidf(preprocessed, params)
     except ValueError as e:
         log.error(e)
         return [np.ndarray(0), np.ndarray(0)]
-    w2v_features = generate_w2v(preprocessed, params)
+    w2v_features, w2v_model = generate_w2v(preprocessed, params)
 
     stacked_features = np.concatenate(
         [bow_features, tfidf_features, w2v_features], axis=1
     )
-    fs = SelectKBest(score_func=f_regression, k=params["k_best_features"])
-    best_features = fs.fit_transform(stacked_features, preprocessed.label)
-    return [best_features, preprocessed.label.values]
+    # fs = SelectKBest(score_func=f_regression, k=params["k_best_features"])
+    # best_features_selector = fs.fit(stacked_features, preprocessed.label)
+    # best_features = fs.transform(stacked_features)
+    return [stacked_features,
+            preprocessed.label.values,
+            bow_victorizer,
+            tfidf_vevtorizer,
+            w2v_model,
+            # best_features_selector
+            ]
